@@ -1,0 +1,44 @@
+name: mern_docker
+services:
+  mongo:
+    image: mongo
+    container_name: mongo_c
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - '27017:27017'
+
+  api:
+    image: api:v1
+    build: ./api
+    container_name: api_c
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mongo
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/mydb
+
+  client:
+    image: client:v1
+    build: ./viteSWC_app
+    container_name: viteSWCapp_c
+    ports:
+      - '5173:5173'
+    depends_on:
+      - api
+    volumes:
+      - ./viteSWC_app:/app
+      - /app/node_modules
+    # stdin_open: true
+    # tty: true
+
+volumes:
+  mongo-data: {}
+# docker compose up
+# docker compose down -rmi all -v
+# docker compose start stop
